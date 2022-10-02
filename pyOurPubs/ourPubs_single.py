@@ -13,7 +13,7 @@ def get_pubs(thisStudent):
 
     # Create a GraphQL query in plain text
 
-    queryTemplate = '((Irvine[Ad]) AND ("2017/01/01"[Date - Create] : "3000"[Date - Create])) AND ({thisStudentLastName} {thisStudentFirstInitial}*[Author]) AND ({thisPILastName}[Author])'
+    queryTemplate = '((Irvine[Ad]) AND ("2022/01/01"[Date - Create] : "3000"[Date - Create])) AND ({thisStudentLastName} {thisStudentFirstInitial}*[Author]) AND ({thisPILastName}[Author])'
     query=queryTemplate.format(thisStudentLastName=thisStudent.lastName,
          thisStudentFirstInitial=thisStudent.firstName[0], 
          thisPILastName=thisStudent.PILastName)

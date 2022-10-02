@@ -32,6 +32,12 @@ def get_our_pubs(dfStudentList):
     print('And all together: \n')
     print(df_pub_list)
 
+    writer = pd.ExcelWriter('results/papers.xlsx', engine='xlsxwriter')
+    df_pub_list.to_excel(writer)
+    writer.save()
+
+
+
 if __name__ == "__main__":
     if 1:
         dfStudentList = pd.read_excel('StudentList.xlsx')
