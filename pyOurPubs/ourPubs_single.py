@@ -2,6 +2,8 @@ from pymed import PubMed
 import pandas as pd
 import xlsxwriter
 
+from grad_utils import Student
+
 def get_pubs(thisStudent):
 
     # Create a PubMed object that GraphQL can use to query
@@ -16,19 +18,19 @@ def get_pubs(thisStudent):
          thisStudentFirstInitial=thisStudent.firstName[0], 
          thisPILastName=thisStudent.PILastName)
 
-    print(query)
+    #print(query)
 
     # Execute the query against the API
     results = pubmed.query(query, max_results=500)
 
-    print(results)
+    #print(results)
 
     # create dataframe
     df_pub_list = pd.DataFrame(columns=['studentFirstName', 'studentLastName', 'PILastName', 'Title', 'Journal', 'Date','pmid'])
 
     # Loop over the retrieved articles
     try:
-        print('hello')
+        #print('hello')
         for article in results:
             # print('begin article')
             # # Extract and format information from the article
@@ -55,21 +57,15 @@ def get_pubs(thisStudent):
             #print('dict created')
             #print(str(this_pub['Date']) + ': ' + str(this_pub['Title']))
 
-            print(this_pub)
+            #print(this_pub)
             df_pub_list = df_pub_list.append(this_pub, ignore_index=True) 
     except:
         print("Unable to find any PubMed articles for " + thisStudent.lastName + "\n")
 
-    print(df_pub_list) 
+    #print(df_pub_list) 
     return df_pub_list
 
 
-class Student:
-    lastName = "Park"
-    firstName = "Sohyeon"
-    def __init__(self, lastName,firstName):
-        self.lastName = lastName
-        self.firstName = firstName
 
 if __name__ == "__main__":
 
