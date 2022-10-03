@@ -1,46 +1,76 @@
+# get list of all reference letter writers
+
 import PyPDF2
+import glob
+import pandas as pd
 
-data_dir = '/Users/jun/Dropbox/science/service/MCSB/Admissions/presence/all_downloads/'
+data_dir = '/Users/jun/Dropbox/science/service/MCSB/Admissions/presence/'
 
-filename = data_dir + 'download (32).pdf'
+df_referee_list = pd.DataFrame(columns=['Referee email', 'Referee name', 'studentFirstName', 'studentLastName', 'PILastName'])
 
-pdf = open(filename, 'rb')
-pdfReader = PyPDF2.PdfFileReader(pdf)
+dir_list = glob.glob(data_dir + 'all_downloads/down*')
 
-## ---- get student name from first page
-page_one = pdfReader.getPage(0)
-#print(page_one.extractText())
-page_one_text = page_one.extractText().split("\n")
-name_line = page_one_text[-3]
-name_line = name_line[2:].split(";")[0]
-student_first_name = name_line.split(',')[1].lstrip()
-student_last_name  = name_line.split(',')[0]
+for single_filename in dir_list:
 
-print(student_first_name + ' ' + student_last_name)
+    print(single_filename)
 
-## ---- get referee name and e-mail
+    filename = single_filename
 
-### -- find pages with referee info. Search "Recommender"
-numOfPages = pdfReader.getNumPages()
+    pdf = open(filename, 'rb')
+    pdfReader = PyPDF2.PdfFileReader(pdf)
 
-for i in range(1, numOfPages):
-    #print("- - - - - - - - - - - - - - - - - - - -")
-    pageObj = pdfReader.getPage(i)
-    if pageObj.extractText().find('Certification Signature') > 0:
-        #print("Page Number: " + str(i))
-        #print(pageObj.extractText())
+    ## ---- get student name from first page
+    page_one = pdfReader.getPage(0)
+    #print(page_one.extractText())
+    page_one_text = page_one.extractText().split("\n")
+    name_line = page_one_text[-3]
+    name_line = name_line[2:].split(";")[0]
+    student_first_name = name_line.split(',')[1].lstrip()
+    student_last_name  = name_line.split(',')[0]
 
-        recommender_cover = pageObj.extractText().split("\n")
-        recommender_name_line_number = recommender_cover.index("Signature")+1
-        recommender_name = recommender_cover[recommender_name_line_number]
-        recommender_name = recommender_name[:recommender_name.index(student_last_name)]
+    print(student_first_name + ' ' + student_last_name)
 
-        recommender_email_line_number = recommender_cover.index("Email")+1
-        recommender_email = recommender_cover[recommender_email_line_number]
+    ## ---- get referee name and e-mail
 
-        print(recommender_name + ', e-mail:' + recommender_email) 
+    ### -- find pages with referee info. Search "Recommender"
+    numOfPages = pdfReader.getNumPages()
 
-    #print("- - - - - - - - - - - - - - - - - - - -")
+    for i in range(1, numOfPages):
+        #print("- - - - - - - - - - - - - - - - - - - -")
+        pageObj = pdfReader.getPage(i)
+        if pageObj.extractText().find('Certification Signature') > 0:
+            #print("Page Number: " + str(i))
+            #print(pageObj.extractText())
 
-# close the PDF file object
-pdf.close()
+            try:
+                recommender_cover = pageObj.extractText().split("\n")
+                recommender_name_line_number = recommender_cover.index("Signature")+1
+                recommender_line = recommender_cover[recommender_name_line_number]
+                if student_last_name in recommender_line:
+                    recommender_name = recommender_line[:recommender_line.index(student_last_name)]
+                else:
+                    recommender_name = recommender_line
+
+                recommender_email_line_number = recommender_cover.index("Email")+1
+                recommender_email = recommender_cover[recommender_email_line_number]
+
+                print(recommender_name + ', e-mail:' + recommender_email) 
+
+                            # Extract and format information from the article
+                this_referee = {'Referee email':recommender_email, 
+                'Referee name': recommender_name, 
+                'studentFirstName': student_first_name, 
+                'studentLastName': student_last_name,
+                'PILastName': 'BLANK'}
+
+                df_referee_list = df_referee_list.append(this_referee, ignore_index=True) 
+            except:
+                print('Couldnt parse pdf for ' + student_last_name)
+
+
+    # close the PDF file object
+    pdf.close()
+
+writer = pd.ExcelWriter(data_dir + 'results/writers.xlsx', engine='xlsxwriter')
+df_referee_list.to_excel(writer)
+writer.save()
