@@ -1,8 +1,8 @@
 import PyPDF2
 
-data_dir = '/Users/jun/Dropbox/science/service/MCSB/Admissions/presence/'
+data_dir = '/Users/jun/Dropbox/science/service/MCSB/Admissions/presence/all_downloads/'
 
-filename = data_dir + 'download.pdf'
+filename = data_dir + 'download (32).pdf'
 
 pdf = open(filename, 'rb')
 pdfReader = PyPDF2.PdfFileReader(pdf)
@@ -33,6 +33,7 @@ for i in range(1, numOfPages):
         recommender_cover = pageObj.extractText().split("\n")
         recommender_name_line_number = recommender_cover.index("Signature")+1
         recommender_name = recommender_cover[recommender_name_line_number]
+        recommender_name = recommender_name[:recommender_name.index(student_last_name)]
 
         recommender_email_line_number = recommender_cover.index("Email")+1
         recommender_email = recommender_cover[recommender_email_line_number]
