@@ -1,12 +1,16 @@
 import os
+import sys
 from bs4 import BeautifulSoup
 
 
 #os.system("open -a Google\ Chrome \"http://cbc.ca/news\" ")
 
-suffix = 'slate_all_attend'
+if len(sys.argv)>1:
+        suffix = sys.argv[1]
+else:
+    suffix = '_DomPhD'
 
-the_html = open('' + suffix + '.html','r').read()
+the_html = open('Slate Reader' + suffix + '.html','r').read()
 soup = BeautifulSoup(the_html, 'lxml')
 
 rows = soup.find_all('tr')
