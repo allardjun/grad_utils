@@ -4,11 +4,17 @@ import PyPDF2
 import glob
 import pandas as pd
 
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
 data_dir = '/Users/jun/Dropbox/science/service/MCSB/Admissions/presence/'
 
-df_referee_list = pd.DataFrame(columns=['Referee email', 'Referee name', 'studentFirstName', 'studentLastName', 'PILastName'])
+df_referee_list = pd.DataFrame(columns=['Referee email', 'Referee name', 'studentFirstName', 'studentLastName', 'PI_phrase'])
 
 dir_list = glob.glob(data_dir + 'all_downloads/down*')
+
+df_student_PI_pairs = pd.read_excel(data_dir + 'Student_PI_pairs.xlsx')
+
 
 for single_filename in dir_list:
 
@@ -29,6 +35,21 @@ for single_filename in dir_list:
     student_last_name  = name_line.split(',')[0]
 
     print(student_first_name + ' ' + student_last_name)
+
+    ## ---- find PI name ---
+
+    matched_student_name = process.extractOne(student_last_name + ", " + student_first_name, df_student_PI_pairs["Student name"], scorer=fuzz.WRatio)[0]
+    #print(matched_student_name)
+
+    student_row = df_student_PI_pairs.loc[df_student_PI_pairs["Student name"] == matched_student_name]
+    PI_phrase = df_student_PI_pairs.loc[df_student_PI_pairs["Student name"] == matched_student_name]["PI phrase"].values[0]
+    #print(PI_phrase)
+    if PI_phrase == "TBD":
+        PI_full_phrase = ""
+    else:
+        PI_full_phrase = "To give you a small update: " + student_first_name + " matched with Professor " + PI_phrase
+
+    print(PI_full_phrase)        
 
     ## ---- get referee name and e-mail
 
@@ -61,7 +82,7 @@ for single_filename in dir_list:
                 'Referee name': recommender_name, 
                 'studentFirstName': student_first_name, 
                 'studentLastName': student_last_name,
-                'PILastName': 'BLANK'}
+                'PI_phrase': PI_full_phrase}
 
                 df_referee_list = df_referee_list.append(this_referee, ignore_index=True) 
             except:
