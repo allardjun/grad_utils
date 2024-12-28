@@ -23,9 +23,10 @@ import pandas as pd
 
 # Load the Excel file
 
-data_path = '/Volumes/Carrot/Dropbox/science/service/MCSB/Admissions/2024Entry/02Committee/'
+#data_path = '/Volumes/Carrot/Dropbox/science/service/MCSB/Admissions/2024Entry/02Committee/'
+data_path = '/Users/jun/Dropbox/science/service/MCSB/Admissions/2024Entry/02Committee/'
 
-input_file_name = 'MCSB_Admissions_Committee 20240114-144314'  # Replace with your file path
+input_file_name = 'MCSB_Admissions_Committee 20240212-035543'  # Replace with your file path
 
 file_path = data_path + input_file_name + '.xlsx'
 
